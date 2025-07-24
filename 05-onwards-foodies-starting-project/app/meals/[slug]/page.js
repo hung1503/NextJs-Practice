@@ -1,9 +1,37 @@
+import { getMealBySlug } from "@/lib/meals";
+import styles from "./page.module.css";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+
 export default function RecipeMealPage({ params }) {
+  const meal = getMealBySlug(params.slug);
+
+  if (!meal) {
+    notFound();
+  }
+  meal.instructions = meal.instructions.replace(/\n/g, "<br />");
   return (
-    <main>
-      <h1>Recipe Meal</h1>
-      <p>Welcome to the recipe meal page</p>
-      <p>Slug: {params.slug}</p>
-    </main>
+    <>
+      <header className={styles.header}>
+        <div className={styles.image}>
+          <Image alt={meal.title} src={meal.image} fill />
+        </div>
+        <div className={styles.headerText}>
+          <h1>{meal.title}</h1>
+          <p className={styles.creator}>
+            by <a href={`mailto:${"EMAIL"}`}>{meal.creator}</a>
+          </p>
+          <p className={styles.summary}>{meal.summary}</p>
+        </div>
+      </header>
+      <main>
+        <p
+          className={styles.instructions}
+          dangerouslySetInnerHTML={{
+            __html: meal.instructions,
+          }}
+        ></p>
+      </main>
+    </>
   );
 }
